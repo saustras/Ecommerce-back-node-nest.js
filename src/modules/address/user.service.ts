@@ -12,7 +12,7 @@ import { UserCreateDto, UserResponseDto } from './dto/user.dto';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 
 @Injectable()
-export class UserService {
+export class AddressService {
   constructor(
     @InjectRepository(UserEntity) private repository: Repository<UserEntity>,
     @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,

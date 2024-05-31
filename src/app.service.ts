@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoleEntity } from './modules/infrastructure/entities/role.entity';
+import { AddressService } from './modules/address/user.service';
+import { UserCreateDto } from './modules/address/dto/user.dto';
 import { UserEntity } from './modules/infrastructure/entities/user.entity';
 
 
@@ -11,8 +13,7 @@ export class InitService implements OnModuleInit {
   constructor(
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly userService: AddressService
   ) {}
 
   async onModuleInit() {
@@ -38,17 +39,16 @@ export class InitService implements OnModuleInit {
       throw new Error('Role ADMIN not found');
     }
 
-    const  user: Partial<UserEntity> = {
+    const  user: UserCreateDto = {
       username: 'saustras',
       name: 'federico',
       lastname: 'rendon',
       email: 'federendon26@hotmail.com',
       password: '123456',
-      role: role,
+      role: 2,
     };
 
-    const newUser = this.userRepository.create(user);
-    await this.userRepository.save(newUser);
+    this.userService.createNewRegister(user)
   }
 
 }

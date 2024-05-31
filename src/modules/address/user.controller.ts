@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
-import { UserService } from './user.service';
+import { AddressService } from './user.service';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import { UserCreateDto, UserDto, UserResponseDto } from './dto/user.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -12,9 +12,9 @@ import { Role } from 'src/guard/role.enum';
 @ApiCreatedResponse()
 @ApiTags('user')
 @Controller('user')
-export class UserController {
+export class AddressController {
     
-    constructor(private readonly service: UserService) { }
+    constructor(private readonly service: AddressService) { }
 
     @ApiOperation({ summary: 'Paginación de todos los registros' })
     @ApiResponse({

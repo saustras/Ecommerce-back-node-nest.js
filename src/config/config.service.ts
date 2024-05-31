@@ -31,6 +31,7 @@ class ConfigService {
       dropSchema:true,
       autoLoadEntities: true,
       ssl: false,
+      logging: true,
     };
   }
 }

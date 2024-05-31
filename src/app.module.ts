@@ -3,15 +3,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import * as path from 'path';
-import { configService } from './shared/config/config.service';
+import { configService } from './config/config.service';
 import { ConfigModule } from '@nestjs/config';
 import { InitService } from './app.service';
 import { RoleEntity } from './modules/infrastructure/entities/role.entity';
 import { UserEntity } from './modules/infrastructure/entities/user.entity';
-import { UserModule } from './modules/user/user.module';
+import { UserModule } from './modules/address/user.module';
 import { AuthModule } from './modules/security/jwt/auth.module';
-
-
+import { AddressService } from './modules/address/user.service';
+import { CommonFilterService } from './shared/service/common-filter.service';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { AuthModule } from './modules/security/jwt/auth.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-    TypeOrmModule.forFeature([RoleEntity, UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, RoleEntity]),
     WinstonModule.forRoot({
       level: 'debug',
       format: winston.format.combine(
@@ -52,9 +52,9 @@ import { AuthModule } from './modules/security/jwt/auth.module';
     }),
 
     UserModule,
-    AuthModule
+    AuthModule,
   ],
-  providers: [InitService],
+  providers: [InitService, AddressService, CommonFilterService],
   controllers: [],
 })
 export class AppModule {}

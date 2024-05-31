@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index } from 'typeorm';
 import { RoleEntity } from './role.entity';
 import { IsEmail } from 'class-validator';
 
@@ -12,6 +12,7 @@ export class UserEntity {
     nullable: false,
     length: 500,
   })
+  @Index('unique_Username', { unique: true })
   username: string;
 
   @Column('character varying', {
@@ -25,7 +26,6 @@ export class UserEntity {
     name: 'apellido',
     nullable: true,
     length: 500,
-    unique:true
   })
   lastname: string;
 
@@ -34,8 +34,8 @@ export class UserEntity {
     name: 'correo',
     nullable: false,
     length: 500,
-    unique:true
   })
+  @Index('unique_Email', { unique: true })
   email: string;
 
   @Column('character varying', {

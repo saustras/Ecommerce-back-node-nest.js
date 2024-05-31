@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonFilterService } from 'src/shared/service/common-filter.service';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
+import { AddressService } from './user.service';
+import { AddressController } from './user.controller';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import { RoleEntity } from '../infrastructure/entities/role.entity';
 
@@ -10,8 +10,8 @@ import { RoleEntity } from '../infrastructure/entities/role.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity,RoleEntity])],
-  controllers: [UserController],
-  providers: [UserService, CommonFilterService],
-  exports: [UserService],
+  controllers: [AddressController],
+  providers: [AddressService, CommonFilterService],
+  exports: [AddressService],
 })
 export class UserModule {}
