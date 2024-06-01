@@ -5,14 +5,12 @@ import { CommonFilterService } from 'src/shared/service/common-filter.service';
 import { QueryFailedError, Repository } from 'typeorm';
 import { ResponseDataDTO } from 'src/core/interfaces/response.data.dto';
 import { CRUDMessages } from 'src/core/interfaces/messages.enum';
-import { RoleEntity } from '../infrastructure/entities/role.entity';
-import * as bcrypt from 'bcrypt';
 import { instanceToPlain, plainToClass, plainToInstance } from 'class-transformer';
 import { AddressEntity } from '../infrastructure/entities/address.entity';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import { AddressResponseDto } from './dto/address_response.dto';
 import { AddressCreateDto } from './dto/address_create.dto';
-import { AddressDto } from './dto/address.dto';
+
 
 @Injectable()
 export class AddressService {
@@ -20,61 +18,61 @@ export class AddressService {
     @InjectRepository(AddressEntity) private repository: Repository<AddressEntity>,
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
     private commonFilterService: CommonFilterService,
-  ) {}
+  ) { }
 
   async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<AddressResponseDto> | any> {
     const queryBuilder = this.repository.createQueryBuilder('address')
-          .leftJoinAndMapOne('address.user', UserEntity, 'user', 'address.userId = user.id');
+      .leftJoinAndMapOne('address.user', UserEntity, 'user', 'address.userId = user.id');
     const response = await this.commonFilterService.paginateFilter<AddressEntity>(query, this.repository, queryBuilder, 'id');
 
     if (response.statusCode === HttpStatus.NOT_FOUND) {
-        throw new HttpException(response, HttpStatus.NOT_FOUND);
+      throw new HttpException(response, HttpStatus.NOT_FOUND);
     }
 
     const transformedData = response.data.map(address => {
       const plainAddress = instanceToPlain(address);
       if (plainAddress.user) {
-          delete plainAddress.user.password;
+        delete plainAddress.user.password;
       }
       return plainToInstance(AddressResponseDto, plainAddress);
-  });
+    });
 
-  return {
+    return {
       ...response,
       data: transformedData,
-  };
-}
+    };
+  }
 
   async findOne(id: number) {
     const address = await this.repository
       .createQueryBuilder('address')
-      .leftJoinAndSelect('address.user', 'user') 
+      .leftJoinAndSelect('address.user', 'user')
       .where('address.id = :id', { id })
       .getOne();
 
-      if (address && address.user) {
-        delete address.user.password;
-      }
-      
-      const responseDto = plainToClass(AddressResponseDto, instanceToPlain(address));
+    if (address && address.user) {
+      delete address.user.password;
+    }
+
+    const responseDto = plainToClass(AddressResponseDto, instanceToPlain(address));
     return responseDto
       ? {
-          statusCode: HttpStatus.OK,
-          message: [CRUDMessages.GetSuccess],
-          data: responseDto,
-          count: 1,
-        }
+        statusCode: HttpStatus.OK,
+        message: [CRUDMessages.GetSuccess],
+        data: responseDto,
+        count: 1,
+      }
       : {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: [CRUDMessages.GetNotfound],
-          data: [],
-          count: 0,
-        };
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: [CRUDMessages.GetNotfound],
+        data: [],
+        count: 0,
+      };
   }
 
   async createNewRegister(dto: AddressCreateDto) {
     try {
-      const user = await this.userRepository.findOne({ where: { id:  dto.user} });
+      const user = await this.userRepository.findOne({ where: { id: dto.user } });
       if (!user) {
         return {
           statusCode: HttpStatus.BAD_REQUEST,
@@ -83,9 +81,8 @@ export class AddressService {
       }
 
       const addressEntity = plainToClass(AddressEntity, dto);
-
       const creation = await this.repository.save(addressEntity);
-      const responseDto = plainToClass(AddressResponseDto,instanceToPlain(creation));
+      const responseDto = plainToClass(AddressResponseDto, instanceToPlain(creation));
 
       return {
         statusCode: HttpStatus.OK,

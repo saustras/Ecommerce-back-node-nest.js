@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ProductEntity } from './Product.entity';
 
 
 @Entity('platform')
@@ -27,11 +28,13 @@ export class PlatformEntity {
 })
   order: number;
 
-  @Column('character varying', {
+  @Column('simple-json', {
     name: 'icono',
-    length: 500,
     nullable: false,
   })
-  icon: string;
+  icon: Icon | string;
+
+  @OneToMany(() => ProductEntity, product => product.platform)
+  products: ProductEntity[];
 
 }

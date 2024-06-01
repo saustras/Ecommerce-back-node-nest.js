@@ -13,6 +13,7 @@ import { PlatformCreateDto } from './dto/platform_create.dto';
 import { PlatformResponseDto } from './dto/platform_response.dto';
 import { PlatformEntity } from '../infrastructure/entities/platform.entity';
 import { v2 as cloudinary } from 'cloudinary';
+import { ProductEntity } from '../infrastructure/entities/Product.entity';
 
 
 
@@ -20,6 +21,7 @@ import { v2 as cloudinary } from 'cloudinary';
 export class PlatformService {
   constructor(
     @InjectRepository(PlatformEntity) private repository: Repository<PlatformEntity>,
+    @InjectRepository(PlatformEntity) private productRepository: Repository<ProductEntity>,
     private commonFilterService: CommonFilterService,
   ) {}
 
@@ -30,8 +32,8 @@ export class PlatformService {
 }
 
   async findOne(id: number) {
-    const platform = await this.repository.delete({ id: id });
-      const responseDto = plainToClass(PlatformResponseDto, instanceToPlain(platform));
+    const platform = await this.repository.findOne({where: { id:  id} });
+    const responseDto = plainToClass(PlatformResponseDto, instanceToPlain(platform));
     return responseDto
       ? {
           statusCode: HttpStatus.OK,
@@ -50,10 +52,25 @@ export class PlatformService {
   async createNewRegister(dto: PlatformCreateDto, file: Express.Multer.File) {
     try {
       const result = await cloudinary.uploader.upload(file.path);
-      dto.icon = result.secure_url;
+      dto.icon = result;
 
-      const platformEntity  = plainToClass(AddressEntity, dto);
-      const creation = await this.repository.save(platformEntity);
+      let products: ProductEntity [] = [];
+
+      if (dto.products && dto.products.length > 0) {
+        products = await Promise.all(
+          dto.products.map(async (productId) => {
+            const product = await this.productRepository.findOne({where: { id:  productId} });
+            if (!product) {
+              throw new Error(`El producto con el id ${productId} no se encontro.`);
+            }
+            return product;
+          })
+        );
+      }
+
+      const platform  = plainToClass(PlatformEntity, dto);
+      platform.products = products;
+      const creation = await this.repository.save(platform);
       const responseDto = plainToClass(AddressResponseDto,instanceToPlain(creation));
 
       return {
@@ -70,11 +87,11 @@ export class PlatformService {
     try {
       if (file) {
         const result = await cloudinary.uploader.upload(file.path);
-        dto.icon = result.secure_url;
+        dto.icon = result;
       }
 
-      const platformEntity = plainToClass(AddressEntity, dto);
-      const { affected } = await this.repository.update({ id: id }, platformEntity);
+      const platform = plainToClass(PlatformEntity, dto);
+      const { affected } = await this.repository.update({ id: id }, platform);
       if (affected == 1) {
         return {
           statusCode: HttpStatus.OK,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserDto } from 'src/modules/user/dto/user.dto';
+import { ProductEntity } from 'src/modules/infrastructure/entities/Product.entity';
 
 export class PlatformResponseDto {
   @ApiProperty({ title: 'id', example: 1 })
@@ -16,4 +16,7 @@ export class PlatformResponseDto {
 
   @ApiProperty({ title: 'nombre', example: 'imagen' })
   icon: string;
+
+  @ApiProperty({ title: 'products', example: 1, type: () => ProductEntity })
+  products: ProductEntity[];
 }

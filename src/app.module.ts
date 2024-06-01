@@ -16,6 +16,9 @@ import { AddressModule } from './modules/address/address.module';
 import { UserService } from './modules/user/user.service';
 import { PlatformModule } from './modules/platform/platform.module';
 import { CloudinaryProvider } from './config/cloudinari.service';
+import { ProductModule } from './modules/product/product.module';
+import { PlatformEntity } from './modules/infrastructure/entities/platform.entity';
+import { ProductEntity } from './modules/infrastructure/entities/Product.entity';
 
 @Module({
   imports: [
@@ -24,7 +27,7 @@ import { CloudinaryProvider } from './config/cloudinari.service';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
-    TypeOrmModule.forFeature([UserEntity, RoleEntity]),
+    TypeOrmModule.forFeature([UserEntity, RoleEntity, PlatformEntity, ProductEntity]),
     WinstonModule.forRoot({
       level: 'debug',
       format: winston.format.combine(
@@ -58,7 +61,8 @@ import { CloudinaryProvider } from './config/cloudinari.service';
     UserModule,
     AuthModule,
     AddressModule,
-    PlatformModule
+    PlatformModule,
+    ProductModule 
   ],
   providers: [InitService, UserService, CommonFilterService, CloudinaryProvider],
   controllers: [],

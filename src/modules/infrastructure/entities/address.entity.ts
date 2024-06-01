@@ -31,7 +31,6 @@ export class AddressEntity {
 
   @Column('character varying', {
     name: 'ciudad',
-    length: 500,
     nullable: false,
   })
   city: string;

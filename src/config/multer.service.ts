@@ -15,4 +15,7 @@ const cloudinaryStorage = new CloudinaryStorage({
 
 export const MulterConfig = {
   storage: cloudinaryStorage,
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+  },
 };
