@@ -99,10 +99,12 @@ export class ProductController {
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(Role.ADMIN)
     @Put(':id') 
-    @UseInterceptors(FilesInterceptor('files', 20, MulterConfig))
-    async updateRegister(@Body() dto: ProductCreateDto, id:number,
+    @UseInterceptors(AnyFilesInterceptor(MulterConfig))
+    async updateRegister(@Body() dto: ProductCreateDto, @Param('id') id:number,
     @UploadedFiles() files: Express.Multer.File[] ) {
-        const [coverFile, wallpaperFile, ...screenshotFiles] = files;
+        const coverFile = files.find(file => file.fieldname === 'cover');
+        const wallpaperFile = files.find(file => file.fieldname === 'wallpaper');
+        const screenshotFiles = files.filter(file => file.fieldname === 'screenshots');
         return await this.service.updateRegister(dto, id, coverFile, wallpaperFile, screenshotFiles);
     }
 
@@ -115,7 +117,7 @@ export class ProductController {
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(Role.ADMIN)
     @Delete(':id')
-    async deleteRegister(@Param('id') id: any) {
+    async deleteRegister(@Param('id') id: number) {
         return await this.service.deleteRegister(id);
     }
 }

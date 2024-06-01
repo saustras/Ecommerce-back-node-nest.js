@@ -24,14 +24,20 @@ export class ProductService {
   ) {}
 
   async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<ProductResponseDto> | any> {
-    const queryBuilder = this.repository.createQueryBuilder('Product')
+    const queryBuilder = this.repository.createQueryBuilder('product')
+      .leftJoinAndMapOne('product.platform', PlatformEntity, 'platform', 'product.platformId = platform.id');
     return await this.commonFilterService.paginateFilter<ProductEntity>(query, this.repository, queryBuilder, 'id');
 
-}
+  }
 
   async findOne(id: number) {
-    const product = await this.repository.findOne({where: { id:  id} });
-      const responseDto = plainToClass(ProductResponseDto, instanceToPlain(product));
+    const product = await this.repository
+          .createQueryBuilder('product')
+          .leftJoinAndSelect('product.platform', 'platform') 
+          .where('product.id = :id', { id })
+          .getOne();
+
+    const responseDto = plainToClass(ProductResponseDto, instanceToPlain(product));
     return responseDto
       ? {
           statusCode: HttpStatus.OK,
@@ -74,7 +80,7 @@ export class ProductService {
       product.platform = platform;
 
       const creation = await this.repository.save(product);
-      const responseDto = plainToClass(AddressResponseDto,instanceToPlain(creation));
+      const responseDto = plainToClass(ProductResponseDto,instanceToPlain(creation));
 
       return {
         statusCode: HttpStatus.OK,
@@ -92,12 +98,25 @@ export class ProductService {
                       wallpaperFile: Express.Multer.File, 
                       screenshotFiles: Express.Multer.File[] ) {
     try {
+      let platform;
+
       if (coverFile && wallpaperFile && screenshotFiles) {
         dto.cover = await cloudinary.uploader.upload(coverFile.path);
         dto.wallpaper = await cloudinary.uploader.upload(wallpaperFile.path);
         dto.screenshots = await Promise.all(screenshotFiles.map(file => cloudinary.uploader.upload(file.path)));
       }
-      const product = plainToClass(ProductEntity, dto);
+      if (!dto.platform) {
+        throw new HttpException("Ingrese la plataforma", HttpStatus.BAD_REQUEST);
+      }
+
+      platform = await this.platformRepository.findOne({where: { id:  dto.platform} });
+
+      if (!platform) {
+        throw new HttpException("La plataforma no existe.", HttpStatus.BAD_REQUEST);
+      }
+
+      const product  = plainToClass(ProductEntity, dto);
+      product.platform = platform;
       const { affected } = await this.repository.update({ id: id }, product);
       if (affected == 1) {
         return {
