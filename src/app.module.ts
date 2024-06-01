@@ -19,6 +19,7 @@ import { CloudinaryProvider } from './config/cloudinari.service';
 import { ProductModule } from './modules/product/product.module';
 import { PlatformEntity } from './modules/infrastructure/entities/platform.entity';
 import { ProductEntity } from './modules/infrastructure/entities/Product.entity';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -62,7 +63,8 @@ import { ProductEntity } from './modules/infrastructure/entities/Product.entity'
     AuthModule,
     AddressModule,
     PlatformModule,
-    ProductModule 
+    ProductModule,
+    OrderModule
   ],
   providers: [InitService, UserService, CommonFilterService, CloudinaryProvider],
   controllers: [],

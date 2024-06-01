@@ -2,6 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany } f
 import { RoleEntity } from './role.entity';
 import { IsEmail } from 'class-validator';
 import { AddressEntity } from './address.entity';
+import { OrderEntity } from './order.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -50,5 +51,9 @@ export class UserEntity {
   role: RoleEntity;
 
   @OneToMany(() => AddressEntity, address => address.user)
-  address: UserEntity[];
+  address: AddressEntity[];
+
+  
+  @OneToMany(() => OrderEntity, address => address.user)
+  order: OrderEntity[];
 }

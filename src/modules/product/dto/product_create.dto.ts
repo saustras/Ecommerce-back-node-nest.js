@@ -16,6 +16,10 @@ export class ProductCreateDto {
   @IsOptional()
   discount: number;
 
+  @IsNumber({}, { message: Message.NUMBER('$property') })
+  @ApiProperty({ title: 'precio', example: 10, required: false })
+  price: number;
+
   @IsString({ message: Message.STRING('$property') })
   @Length(1, 500, { message: Message.LENGTH('$property', '$constraint1 $constraint2') })
   @ApiProperty({ title: 'slug', example: 'producto-1', required: true })
