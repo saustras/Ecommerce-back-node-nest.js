@@ -15,6 +15,12 @@ export class ProductEntity {
   title: string;
 
   @Column({
+    name: 'precio',
+    nullable: true,
+  })
+  price: number;
+
+  @Column({
     name: 'descuento',
     nullable: true,
   })
