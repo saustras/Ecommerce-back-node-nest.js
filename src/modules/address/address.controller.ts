@@ -1,17 +1,21 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
-import { AddressService } from './user.service';
-import { UserEntity } from '../infrastructure/entities/user.entity';
-import { UserCreateDto, UserDto, UserResponseDto } from './dto/user.dto';
+import { AddressResponseDto } from './dto/address_response.dto';
+import { AddressDto } from './dto/address.dto';
+import { AddressCreateDto } from './dto/address_create.dto';
+import { AddressService } from './address.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { Roles } from 'src/guard/roles.decorator';
 import { Role } from 'src/guard/role.enum';
 
+
+
 @ApiCreatedResponse()
-@ApiTags('user')
-@Controller('user')
+@ApiTags('address')
+@Controller('address')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class AddressController {
     
     constructor(private readonly service: AddressService) { }
@@ -19,8 +23,8 @@ export class AddressController {
     @ApiOperation({ summary: 'Paginación de todos los registros' })
     @ApiResponse({
         status: 200,
-        type: [UserResponseDto],
-    })
+        type: [AddressResponseDto],
+    }) 
     @ApiQuery({
         name: 'page',
         description: 'Número de página',
@@ -40,8 +44,7 @@ export class AddressController {
         required: false,
     })
 
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN,Role.USER)
     @Get()
     async findAllRegisters(@Paginate() query: PaginateQuery) {
         return await this.service.findAllRegisters(query);
@@ -54,28 +57,32 @@ export class AddressController {
     })
     @ApiResponse({
         status: 200,
-        type: UserDto,
+        type: AddressDto,
     })
+    
+    @Roles(Role.ADMIN,Role.USER)
     @Get(':id')
     async findOneRegisterById(@Param('id') id: number) {
         return await this.service.findOne(id);
     }
 
     @ApiOperation({ summary: 'Guardar nuevo registro' })
-    @ApiBody({ type: UserCreateDto })
+    @ApiBody({ type: AddressCreateDto })
     @ApiResponse({
         status: 200,
         description: 'Guarda un nuevo registro',
-        type: UserResponseDto,
+        type: AddressResponseDto,
     })
 
+    
+    @Roles(Role.ADMIN,Role.USER)
     @Post()
-    async createNewRegister(@Body() dto: UserCreateDto) {
+    async createNewRegister(@Body() dto: AddressCreateDto) {
         return await this.service.createNewRegister(dto);
     }
 
     @ApiOperation({ summary: 'Actualiza un registro' })
-    @ApiBody({ type: UserDto })
+    @ApiBody({ type: AddressCreateDto })
     @ApiParam({
         name: 'id',
         description: 'Identificador.',
@@ -83,10 +90,12 @@ export class AddressController {
     @ApiResponse({
         status: 200,
         description: 'Actualiza un registro',
-        type: UserResponseDto,
+        type: AddressResponseDto,
     })
+    
+    @Roles(Role.ADMIN,Role.USER)
     @Put(':id')
-    async updateRegister(@Body() dto: UserDto, @Param('id') id: any) {
+    async updateRegister(@Body() dto: AddressCreateDto, @Param('id') id: any) {
         return await this.service.updateRegister(dto, id);
     }
 
@@ -95,6 +104,8 @@ export class AddressController {
         name: 'id',
         description: 'Busca por su identificador',
     })
+    
+    @Roles(Role.ADMIN,Role.USER)
     @Delete(':id')
     async deleteRegister(@Param('id') id: any) {
         return await this.service.deleteRegister(id);

@@ -8,10 +8,14 @@ import { ConfigModule } from '@nestjs/config';
 import { InitService } from './app.service';
 import { RoleEntity } from './modules/infrastructure/entities/role.entity';
 import { UserEntity } from './modules/infrastructure/entities/user.entity';
-import { UserModule } from './modules/address/user.module';
 import { AuthModule } from './modules/security/jwt/auth.module';
-import { AddressService } from './modules/address/user.service';
+import { AddressService } from './modules/address/address.service';
 import { CommonFilterService } from './shared/service/common-filter.service';
+import { UserModule } from './modules/user/user.module';
+import { AddressModule } from './modules/address/address.module';
+import { UserService } from './modules/user/user.service';
+import { PlatformModule } from './modules/platform/platform.module';
+import { CloudinaryProvider } from './config/cloudinari.service';
 
 @Module({
   imports: [
@@ -53,8 +57,10 @@ import { CommonFilterService } from './shared/service/common-filter.service';
 
     UserModule,
     AuthModule,
+    AddressModule,
+    PlatformModule
   ],
-  providers: [InitService, AddressService, CommonFilterService],
+  providers: [InitService, UserService, CommonFilterService, CloudinaryProvider],
   controllers: [],
 })
 export class AppModule {}

@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany } from 'typeorm';
 import { RoleEntity } from './role.entity';
 import { IsEmail } from 'class-validator';
+import { AddressEntity } from './address.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -47,4 +48,7 @@ export class UserEntity {
 
   @ManyToOne(() => RoleEntity, role => role.users)
   role: RoleEntity;
+
+  @OneToMany(() => AddressEntity, address => address.user)
+  address: UserEntity[];
 }

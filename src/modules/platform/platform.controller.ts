@@ -1,27 +1,31 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
-import { UserService } from './user.service';
-import { UserDto } from './dto/user.dto';
+import { PlatformService } from './platform.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { Roles } from 'src/guard/roles.decorator';
 import { Role } from 'src/guard/role.enum';
-import { UserResponseDto } from './dto/user-response.dto';
-import { UserCreateDto } from './dto/user-create.dto';
+import { PlatformResponseDto } from './dto/platform_response.dto';
+import { PlatformCreateDto } from './dto/platform_create.dto';
+import { MulterConfig } from 'src/config/multer.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+
+
 
 @ApiCreatedResponse()
-@ApiTags('user')
-@Controller('user')
-export class UserController {
+@ApiTags('Platform')
+@Controller('Platform')
+
+export class PlatformController {
     
-    constructor(private readonly service: UserService) { }
+    constructor(private readonly service: PlatformService) { }
 
     @ApiOperation({ summary: 'Paginación de todos los registros' })
     @ApiResponse({
         status: 200,
-        type: [UserResponseDto],
-    })
+        type: [PlatformResponseDto],
+    }) 
     @ApiQuery({
         name: 'page',
         description: 'Número de página',
@@ -41,8 +45,7 @@ export class UserController {
         required: false,
     })
 
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles(Role.ADMIN)
+
     @Get()
     async findAllRegisters(@Paginate() query: PaginateQuery) {
         return await this.service.findAllRegisters(query);
@@ -55,28 +58,32 @@ export class UserController {
     })
     @ApiResponse({
         status: 200,
-        type: UserDto,
+        type: PlatformResponseDto,
     })
+    
     @Get(':id')
     async findOneRegisterById(@Param('id') id: number) {
         return await this.service.findOne(id);
     }
 
     @ApiOperation({ summary: 'Guardar nuevo registro' })
-    @ApiBody({ type: UserCreateDto })
+    @ApiBody({ type: PlatformCreateDto })
     @ApiResponse({
         status: 200,
         description: 'Guarda un nuevo registro',
-        type: UserResponseDto,
+        type: PlatformResponseDto,
     })
 
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(Role.ADMIN)
     @Post()
-    async createNewRegister(@Body() dto: UserCreateDto) {
-        return await this.service.createNewRegister(dto);
+    @UseInterceptors(FileInterceptor('file', MulterConfig))
+    async createNewRegister(@Body() dto: PlatformCreateDto, @UploadedFile() file: Express.Multer.File) {
+        return await this.service.createNewRegister(dto, file);
     }
 
     @ApiOperation({ summary: 'Actualiza un registro' })
-    @ApiBody({ type: UserDto })
+    @ApiBody({ type: PlatformCreateDto })
     @ApiParam({
         name: 'id',
         description: 'Identificador.',
@@ -84,11 +91,15 @@ export class UserController {
     @ApiResponse({
         status: 200,
         description: 'Actualiza un registro',
-        type: UserResponseDto,
+        type: PlatformResponseDto,
     })
-    @Put(':id')
-    async updateRegister(@Body() dto: UserDto, @Param('id') id: any) {
-        return await this.service.updateRegister(dto, id);
+    
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(Role.ADMIN)
+    @Put(':id') 
+    @UseInterceptors(FileInterceptor('file', MulterConfig))
+    async updateRegister(@Body() dto: PlatformCreateDto, @Param('id') id: number, @UploadedFile() file: Express.Multer.File ) {
+        return await this.service.updateRegister(dto, id, file);
     }
 
     @ApiOperation({ summary: 'Elimina un registro por identificador' })
@@ -96,6 +107,9 @@ export class UserController {
         name: 'id',
         description: 'Busca por su identificador',
     })
+    
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(Role.ADMIN)
     @Delete(':id')
     async deleteRegister(@Param('id') id: any) {
         return await this.service.deleteRegister(id);

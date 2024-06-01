@@ -2,9 +2,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoleEntity } from './modules/infrastructure/entities/role.entity';
-import { AddressService } from './modules/address/user.service';
-import { UserCreateDto } from './modules/address/dto/user.dto';
-import { UserEntity } from './modules/infrastructure/entities/user.entity';
+import { UserCreateDto } from './modules/user/dto/user-create.dto';
+import { UserService } from './modules/user/user.service';
 
 
 
@@ -13,7 +12,7 @@ export class InitService implements OnModuleInit {
   constructor(
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
-    private readonly userService: AddressService
+    private readonly userService: UserService
   ) {}
 
   async onModuleInit() {

@@ -5,6 +5,7 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import { RoleEntity } from '../infrastructure/entities/role.entity';
+import { AddressService } from '../address/address.service';
 
 
 

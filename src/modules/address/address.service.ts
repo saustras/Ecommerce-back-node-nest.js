@@ -6,42 +6,57 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { ResponseDataDTO } from 'src/core/interfaces/response.data.dto';
 import { CRUDMessages } from 'src/core/interfaces/messages.enum';
 import { RoleEntity } from '../infrastructure/entities/role.entity';
-import { UserEntity } from '../infrastructure/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { UserCreateDto, UserResponseDto } from './dto/user.dto';
-import { instanceToPlain, plainToClass } from 'class-transformer';
+import { instanceToPlain, plainToClass, plainToInstance } from 'class-transformer';
+import { AddressEntity } from '../infrastructure/entities/address.entity';
+import { UserEntity } from '../infrastructure/entities/user.entity';
+import { AddressResponseDto } from './dto/address_response.dto';
+import { AddressCreateDto } from './dto/address_create.dto';
+import { AddressDto } from './dto/address.dto';
 
 @Injectable()
 export class AddressService {
   constructor(
-    @InjectRepository(UserEntity) private repository: Repository<UserEntity>,
-    @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
+    @InjectRepository(AddressEntity) private repository: Repository<AddressEntity>,
+    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
     private commonFilterService: CommonFilterService,
   ) {}
 
-  async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<UserResponseDto> | any> {
-    const queryBuilder = this.repository.createQueryBuilder('user');
-    queryBuilder.leftJoinAndMapOne('user.role', RoleEntity, 'role', 'user.roleId = role.id');
-    const response = await this.commonFilterService.paginateFilter<UserResponseDto>(query, this.repository, queryBuilder, 'id');
+  async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<AddressResponseDto> | any> {
+    const queryBuilder = this.repository.createQueryBuilder('address')
+          .leftJoinAndMapOne('address.user', UserEntity, 'user', 'address.userId = user.id');
+    const response = await this.commonFilterService.paginateFilter<AddressEntity>(query, this.repository, queryBuilder, 'id');
 
     if (response.statusCode === HttpStatus.NOT_FOUND) {
         throw new HttpException(response, HttpStatus.NOT_FOUND);
     }
 
-    return response;
+    const transformedData = response.data.map(address => {
+      const plainAddress = instanceToPlain(address);
+      if (plainAddress.user) {
+          delete plainAddress.user.password;
+      }
+      return plainToInstance(AddressResponseDto, plainAddress);
+  });
+
+  return {
+      ...response,
+      data: transformedData,
+  };
 }
 
   async findOne(id: number) {
-    const user = await this.repository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.role', 'role') 
-      .where('user.id = :id', { id })
+    const address = await this.repository
+      .createQueryBuilder('address')
+      .leftJoinAndSelect('address.user', 'user') 
+      .where('address.id = :id', { id })
       .getOne();
+
+      if (address && address.user) {
+        delete address.user.password;
+      }
       
-    const responseDto = plainToClass(UserResponseDto, {
-      ...instanceToPlain(user),
-      password: undefined, 
-    } as UserEntity);
+      const responseDto = plainToClass(AddressResponseDto, instanceToPlain(address));
     return responseDto
       ? {
           statusCode: HttpStatus.OK,
@@ -57,26 +72,20 @@ export class AddressService {
         };
   }
 
-  async createNewRegister(dto: UserCreateDto) {
+  async createNewRegister(dto: AddressCreateDto) {
     try {
-      const role = await this.roleRepository.findOne({ where: { id:  dto.role} });
-      if (!role) {
+      const user = await this.userRepository.findOne({ where: { id:  dto.user} });
+      if (!user) {
         return {
           statusCode: HttpStatus.BAD_REQUEST,
-          message: ['Role not found'],
+          message: ['No existe el usuario.'],
         };
       }
-      const salt = await bcrypt.genSalt(10);
-      dto.password = await bcrypt.hash(dto.password, salt);
 
-      const userEntity = plainToClass(UserEntity, dto);
-      userEntity.role = role;
+      const addressEntity = plainToClass(AddressEntity, dto);
 
-      const creation = await this.repository.save(userEntity);
-      const responseDto = plainToClass(UserResponseDto, {
-        ...instanceToPlain(creation),
-        password: undefined, 
-      } as UserEntity);
+      const creation = await this.repository.save(addressEntity);
+      const responseDto = plainToClass(AddressResponseDto,instanceToPlain(creation));
 
       return {
         statusCode: HttpStatus.OK,
@@ -84,22 +93,14 @@ export class AddressService {
         data: responseDto,
       };
     } catch (error) {
-      if (error instanceof QueryFailedError) {
-        if (error.message.includes('unique_Username')) {
-          throw new HttpException('El nombre de usuario ya existe.', HttpStatus.BAD_REQUEST);
-        }
-        if (error.message.includes('unique_Email')) {
-          throw new HttpException('Ya correo ya existe.', HttpStatus.BAD_REQUEST);
-        }
-      }
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async updateRegister(dto: UserCreateDto, id: number) {
+  async updateRegister(dto: AddressCreateDto, id: number) {
     try {
-      const userEntity = plainToClass(UserEntity, dto);
-      const { affected } = await this.repository.update({ id: id }, userEntity);
+      const addressEntity = plainToClass(AddressEntity, dto);
+      const { affected } = await this.repository.update({ id: id }, addressEntity);
       if (affected == 1) {
         return {
           statusCode: HttpStatus.OK,
@@ -108,7 +109,7 @@ export class AddressService {
       } else {
         return {
           statusCode: HttpStatus.NOT_FOUND,
-          message: [CRUDMessages.AlreadyExists],
+          message: [CRUDMessages.GetNotfound],
         };
       }
     } catch (error) {
@@ -130,7 +131,7 @@ export class AddressService {
       } else {
         return {
           statusCode: HttpStatus.NOT_FOUND,
-          message: [CRUDMessages.AlreadyExists],
+          message: [CRUDMessages.GetNotfound],
         };
       }
     } catch (error) {

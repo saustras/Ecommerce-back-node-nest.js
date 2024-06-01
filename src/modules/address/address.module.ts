@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonFilterService } from 'src/shared/service/common-filter.service';
-import { AddressService } from './user.service';
-import { AddressController } from './user.controller';
+import { AddressService } from './address.service';
+import { AddressController } from './address.controller';
 import { UserEntity } from '../infrastructure/entities/user.entity';
-import { RoleEntity } from '../infrastructure/entities/role.entity';
+import { AddressEntity } from '../infrastructure/entities/address.entity';
 
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity,RoleEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity, AddressEntity])],
   controllers: [AddressController],
   providers: [AddressService, CommonFilterService],
   exports: [AddressService],
 })
-export class UserModule {}
+export class AddressModule {}

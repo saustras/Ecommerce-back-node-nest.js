@@ -8,8 +8,10 @@ import { CRUDMessages } from 'src/core/interfaces/messages.enum';
 import { RoleEntity } from '../infrastructure/entities/role.entity';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { UserCreateDto, UserResponseDto } from './dto/user.dto';
-import { instanceToPlain, plainToClass } from 'class-transformer';
+
+import { instanceToPlain, plainToClass, plainToInstance } from 'class-transformer';
+import { UserResponseDto } from './dto/user-response.dto';
+import { UserCreateDto } from './dto/user-create.dto';
 
 @Injectable()
 export class UserService {
@@ -20,16 +22,26 @@ export class UserService {
   ) {}
 
   async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<UserResponseDto> | any> {
-    const queryBuilder = this.repository.createQueryBuilder('user');
-    queryBuilder.leftJoinAndMapOne('user.role', RoleEntity, 'role', 'user.roleId = role.id');
+    const queryBuilder = this.repository.createQueryBuilder('user')
+          .leftJoinAndMapOne('user.role', RoleEntity, 'role', 'user.roleId = role.id');
     const response = await this.commonFilterService.paginateFilter<UserResponseDto>(query, this.repository, queryBuilder, 'id');
 
     if (response.statusCode === HttpStatus.NOT_FOUND) {
         throw new HttpException(response, HttpStatus.NOT_FOUND);
     }
 
-    return response;
-}
+    const transformedData = response.data.map(user => {
+      const plainUser = instanceToPlain(user);
+      if (plainUser) {
+          delete plainUser.password;
+      }
+      return plainToInstance(UserResponseDto, plainUser);
+    });
+
+    return {
+        ...response,
+        data: transformedData,
+  };}
 
   async findOne(id: number) {
     const user = await this.repository
@@ -99,6 +111,8 @@ export class UserService {
   async updateRegister(dto: UserCreateDto, id: number) {
     try {
       const userEntity = plainToClass(UserEntity, dto);
+      const salt = await bcrypt.genSalt(10);
+      userEntity.password = await bcrypt.hash(dto.password, salt);
       const { affected } = await this.repository.update({ id: id }, userEntity);
       if (affected == 1) {
         return {
@@ -108,7 +122,7 @@ export class UserService {
       } else {
         return {
           statusCode: HttpStatus.NOT_FOUND,
-          message: [CRUDMessages.AlreadyExists],
+          message: [CRUDMessages.GetNotfound],
         };
       }
     } catch (error) {

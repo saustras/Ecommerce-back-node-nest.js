@@ -41,7 +41,10 @@ export class AuthService {
   }
 
   async validateUserByJwt(payload: JwtPayload): Promise<any> {
-    const user = await this.userRepository.findOne({ where: { id:payload.sub } });
+    const user = await this.userRepository.createQueryBuilder('user')
+        .leftJoinAndSelect('user.role', 'role') 
+        .where('user.id = :id', { id: payload.sub })
+        .getOne();
     if (user) {
       const { password, ...result } = user;
       return result;
