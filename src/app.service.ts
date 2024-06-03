@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { RoleEntity } from './modules/infrastructure/entities/role.entity';
 import { UserCreateDto } from './modules/user/dto/user-create.dto';
 import { UserService } from './modules/user/user.service';
+import { UserEntity } from './modules/infrastructure/entities/user.entity';
 
 
 
@@ -12,6 +13,8 @@ export class InitService implements OnModuleInit {
   constructor(
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private readonly userService: UserService
   ) {}
 
@@ -33,21 +36,23 @@ export class InitService implements OnModuleInit {
 
   private async createUser() {
     const role = await this.roleRepository.findOne({ where: { name: 'ADMIN' } });
+    const user = await this.userRepository.findOne({ where: { username: 'saustras' } });
 
     if (!role) {
       throw new Error('Role ADMIN not found');
     }
 
-    const  user: UserCreateDto = {
-      username: 'saustras',
-      name: 'federico',
-      lastname: 'rendon',
-      email: 'federendon26@hotmail.com',
-      password: '123456',
-      role: 2,
-    };
-
-    this.userService.createNewRegister(user)
+    if (!user) {
+      const  admin: UserCreateDto = {
+        username: 'saustras',
+        name: 'federico',
+        lastname:'rendon',
+        email: 'federendon26@hotmail.com',
+        password: '123456',
+        role: 2,
+      };
+  
+      this.userService.createNewRegister(admin)
+    }
   }
-
 }

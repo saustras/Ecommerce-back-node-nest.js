@@ -23,6 +23,11 @@ export class AddressService {
   async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<AddressResponseDto> | any> {
     const queryBuilder = this.repository.createQueryBuilder('address')
       .leftJoinAndMapOne('address.user', UserEntity, 'user', 'address.userId = user.id');
+
+      if (query.filter && query.filter['user.id']) {
+        queryBuilder.where('user.id = :userId', { userId: query.filter['user.id'] });
+      }
+
     const response = await this.commonFilterService.paginateFilter<AddressEntity>(query, this.repository, queryBuilder, 'id');
 
     if (response.statusCode === HttpStatus.NOT_FOUND) {
@@ -82,6 +87,7 @@ export class AddressService {
 
       const addressEntity = plainToClass(AddressEntity, dto);
       const creation = await this.repository.save(addressEntity);
+      creation.user = user;
       const responseDto = plainToClass(AddressResponseDto, instanceToPlain(creation));
 
       return {

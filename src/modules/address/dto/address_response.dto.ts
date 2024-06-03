@@ -26,6 +26,6 @@ export class AddressResponseDto {
   @ApiProperty({ title: 'teléfono', example: '123-456-7890' })
   phone: string;
 
-  @ApiProperty({ title: 'usuario', example: 1, type: () => UserDto })
-  user: UserDto;
+  @ApiProperty({ title: 'usuario', example: 1, })
+  user: number;
 }

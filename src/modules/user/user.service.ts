@@ -12,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { instanceToPlain, plainToClass, plainToInstance } from 'class-transformer';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UserCreateDto } from './dto/user-create.dto';
+import { UserUpdateDto } from './dto/user-updatedto';
 
 @Injectable()
 export class UserService {
@@ -108,11 +109,13 @@ export class UserService {
     }
   }
 
-  async updateRegister(dto: UserCreateDto, id: number) {
+  async updateRegister(dto: UserUpdateDto, id: number) {
     try {
       const userEntity = plainToClass(UserEntity, dto);
-      const salt = await bcrypt.genSalt(10);
-      userEntity.password = await bcrypt.hash(dto.password, salt);
+      if (dto.password) {
+        const salt = await bcrypt.genSalt(10);
+        userEntity.password = await bcrypt.hash(dto.password, salt);
+      }
       const { affected } = await this.repository.update({ id: id }, userEntity);
       if (affected == 1) {
         return {

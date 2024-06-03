@@ -28,7 +28,6 @@ class ConfigService {
       database: this.getValue('POSTGRES_DB'),
       entities: ['dist/**/*.entity.js'], 
       synchronize: true,
-      dropSchema:true,
       autoLoadEntities: true,
       ssl: false,
       logging: true,

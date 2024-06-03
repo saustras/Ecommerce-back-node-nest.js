@@ -7,7 +7,6 @@ const cloudinaryStorage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: 'image',
-      format: 'png',
       public_id: file.originalname,
     };
   },

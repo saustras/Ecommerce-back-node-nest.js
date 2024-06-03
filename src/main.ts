@@ -6,6 +6,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ResponseInterceptor } from './core/interfaces/response.interceptor';
+import { json, urlencoded } from 'body-parser';
 
 
 const docsEndpoint = '/api';
@@ -39,6 +40,11 @@ async function bootstrap() {
       enableImplicitConversion: true
     }
   }))
+
+  app.use(
+   json({ limit: '50mb' }),
+   urlencoded({ limit: '50mb', extended: true }),
+  );
 
   await app.startAllMicroservices();
   await app.listen(`${process.env.PORT}`);

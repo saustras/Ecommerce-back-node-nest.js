@@ -26,6 +26,16 @@ export class ProductService {
   async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<ProductResponseDto> | any> {
     const queryBuilder = this.repository.createQueryBuilder('product')
       .leftJoinAndMapOne('product.platform', PlatformEntity, 'platform', 'product.platformId = platform.id');
+
+    if (query.filter && query.filter['platform.id']) {
+      queryBuilder.where('platform.id = :platformId', { platformId: query.filter['platform.id'] });
+    }
+
+    if (query.filter && query.filter['platform.slug']) {
+      queryBuilder.where('platform.slug = :platformSlug', { platformSlug: query.filter['platform.slug'] });
+    }
+
+
     return await this.commonFilterService.paginateFilter<ProductEntity>(query, this.repository, queryBuilder, 'id');
 
   }

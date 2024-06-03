@@ -10,12 +10,15 @@ export class UserResponseDto {
   
     @ApiProperty({ title: "nombre", example: "Dato de tipo texto" })
     name: string;
-  
+
     @ApiProperty({ title: "apellido", example: "Dato de tipo texto" })
     lastname: string;
   
     @ApiProperty({ title: "correo", example: "Dato de tipo correo" })
     email: string;
+
+    @ApiProperty({ title: "fecha-creado", example: "Dato de tipo fecha" })
+    createdAt: Date;
   
     @ApiProperty({ title: 'role', example: 1, type: () => RoleEntity })
     role: RoleEntity;

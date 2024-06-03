@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany, CreateDateColumn } from 'typeorm';
 import { PlatformEntity } from './platform.entity';
 
 
@@ -64,6 +64,12 @@ export class ProductEntity {
     nullable: false,
   })
   screenshots: Icon[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    name: 'fecha-creado',
+  })
+  createdAt: Date;
 
   @ManyToOne(() => PlatformEntity, platform => platform.products)
   platform: PlatformEntity;

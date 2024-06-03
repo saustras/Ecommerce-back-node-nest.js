@@ -26,14 +26,9 @@ export class ResponseInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<any> {
     const body = await firstValueFrom(next.handle());
-    // const request = context.switchToHttp().getRequest<Request>();
-    // const status =
-    //   this.reflector.get<number>('__httpCode__', context.getHandler()) ||
-    //   (request.method === 'POST' ? 201 : 200);
     return of({
       statusCode: body.statusCode,
       message: Array.isArray(body.message) ? body.message : [body.message],
-      // message:body.message,
       data: body.data,
       count: body.count
     });

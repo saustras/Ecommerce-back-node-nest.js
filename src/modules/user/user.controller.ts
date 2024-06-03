@@ -9,6 +9,7 @@ import { Roles } from 'src/guard/roles.decorator';
 import { Role } from 'src/guard/role.enum';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UserCreateDto } from './dto/user-create.dto';
+import { UserUpdateDto } from './dto/user-updatedto';
 
 @ApiCreatedResponse()
 @ApiTags('user')
@@ -42,7 +43,7 @@ export class UserController {
     })
 
     @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ADMIN, Role.USER)
     @Get()
     async findAllRegisters(@Paginate() query: PaginateQuery) {
         return await this.service.findAllRegisters(query);
@@ -57,6 +58,8 @@ export class UserController {
         status: 200,
         type: UserDto,
     })
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(Role.ADMIN, Role.USER)
     @Get(':id')
     async findOneRegisterById(@Param('id') id: number) {
         return await this.service.findOne(id);
@@ -76,7 +79,7 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Actualiza un registro' })
-    @ApiBody({ type: UserDto })
+    @ApiBody({ type: UserUpdateDto })
     @ApiParam({
         name: 'id',
         description: 'Identificador.',
@@ -86,8 +89,10 @@ export class UserController {
         description: 'Actualiza un registro',
         type: UserResponseDto,
     })
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(Role.ADMIN, Role.USER)
     @Put(':id')
-    async updateRegister(@Body() dto: UserDto, @Param('id') id: any) {
+    async updateRegister(@Body() dto: UserUpdateDto, @Param('id') id: any) {
         return await this.service.updateRegister(dto, id);
     }
 
@@ -96,6 +101,8 @@ export class UserController {
         name: 'id',
         description: 'Busca por su identificador',
     })
+    @Roles(Role.ADMIN, Role.USER)
+    @Put(':id')
     @Delete(':id')
     async deleteRegister(@Param('id') id: any) {
         return await this.service.deleteRegister(id);

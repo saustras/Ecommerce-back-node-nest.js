@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany, CreateDateColumn } from 'typeorm';
 import { RoleEntity } from './role.entity';
 import { IsEmail } from 'class-validator';
 import { AddressEntity } from './address.entity';
@@ -22,14 +22,14 @@ export class UserEntity {
     nullable: false,
     length: 500,
   })
-  name: string;
+  name: string
 
   @Column('character varying', {
     name: 'apellido',
     nullable: true,
     length: 500,
   })
-  lastname: string;
+  lastname: string
 
   @IsEmail({}, { message: 'El correo debe ser válido' })
   @Column('character varying', {
@@ -46,6 +46,12 @@ export class UserEntity {
     length: 500,
   })
   password: string;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    name: 'fecha-creado',
+  })
+  createdAt: Date;
 
   @ManyToOne(() => RoleEntity, role => role.users)
   role: RoleEntity;

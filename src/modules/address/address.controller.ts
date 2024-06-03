@@ -9,6 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { Roles } from 'src/guard/roles.decorator';
 import { Role } from 'src/guard/role.enum';
+import { AddressUpdateDto } from './dto/address_update.dto';
 
 
 
@@ -82,7 +83,7 @@ export class AddressController {
     }
 
     @ApiOperation({ summary: 'Actualiza un registro' })
-    @ApiBody({ type: AddressCreateDto })
+    @ApiBody({ type: AddressUpdateDto })
     @ApiParam({
         name: 'id',
         description: 'Identificador.',
@@ -95,7 +96,7 @@ export class AddressController {
     
     @Roles(Role.ADMIN,Role.USER)
     @Put(':id')
-    async updateRegister(@Body() dto: AddressCreateDto, @Param('id') id: any) {
+    async updateRegister(@Body() dto: AddressUpdateDto, @Param('id') id: any) {
         return await this.service.updateRegister(dto, id);
     }
 

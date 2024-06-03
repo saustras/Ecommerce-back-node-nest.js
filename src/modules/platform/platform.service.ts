@@ -27,6 +27,7 @@ export class PlatformService {
 
   async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<PlatformResponseDto> | any> {
     const queryBuilder = this.repository.createQueryBuilder('platform')
+      .leftJoinAndSelect('platform.products', 'products');
     return await this.commonFilterService.paginateFilter<PlatformEntity>(query, this.repository, queryBuilder, 'id');
 
 }

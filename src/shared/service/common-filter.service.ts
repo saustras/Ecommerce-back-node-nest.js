@@ -45,14 +45,12 @@ export class CommonFilterService {
 
         let config: PaginateConfig<T> = {
             sortableColumns: columnsName,
-
             searchableColumns: columnsNameStr,
             filterableColumns: filterableColumns,
             defaultSortBy: [[nameId, 'DESC'],],
             defaultLimit: query.limit ? query.limit : 10
         }
         try{
-
             qb?
             resultQuery = await paginate(query,qb,config)
             :resultQuery = await paginate(query,repository,config)
