@@ -26,6 +26,12 @@ export class ProductEntity {
   })
   discount: number;
 
+  @Column({
+    name: 'descuento',
+    nullable: true,
+  })
+  quantity: number;
+
   @Column('character varying', {
     name: 'slug',
     nullable: false,

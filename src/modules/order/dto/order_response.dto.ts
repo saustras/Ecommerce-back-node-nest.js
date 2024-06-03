@@ -19,6 +19,9 @@ export class OrderResponseDto {
   @ApiProperty({ title: 'productos'})
   products: IOrderProduct[];
 
+  @ApiProperty({ title: "fecha-creado", example: "Dato de tipo fecha" })
+  createdAt: Date;
+
   @ApiProperty({ title: 'platform', type: PlatformResponseDto })
   platform: PlatformResponseDto;
 }

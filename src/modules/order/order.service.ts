@@ -13,6 +13,7 @@ import { OrderResponseDto } from './dto/order_response.dto';
 import { OrderCreateDto } from './dto/order_create.dto';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import { StripeService } from 'src/config/stripe.service';
+import { ProductEntity } from '../infrastructure/entities/Product.entity';
 
 
 
@@ -21,6 +22,7 @@ export class OrderService {
   constructor(
     @InjectRepository(OrderEntity) private repository: Repository<OrderEntity>,
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
+    @InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>,
     private commonFilterService: CommonFilterService,
     private stripeService: StripeService,
   ) {}
@@ -28,6 +30,10 @@ export class OrderService {
   async findAllRegisters(query: PaginateQuery): Promise<ResponseDataDTO<OrderResponseDto> | any> {
     const queryBuilder = this.repository.createQueryBuilder('Order')
       .leftJoinAndMapOne('Order.user', UserEntity, 'user', 'Order.userId = user.id');
+
+      if (query.filter && query.filter['user.id']) {
+        queryBuilder.where('user.id = :userId', { userId: query.filter['user.id'] });
+      }
     return await this.commonFilterService.paginateFilter<OrderEntity>(query, this.repository, queryBuilder, 'id');
 
   }
@@ -66,18 +72,35 @@ export class OrderService {
 
   async createNewRegister(dto: OrderCreateDto) {
     try {
-      const currency = "mxn";
+      const currency = "usd";
       let tempPayment = 0;
 
-      dto.products.forEach(product => {
-        const priceTemp = this.calcDiscountPrice(product.price, product.discount);
-        tempPayment += Number(priceTemp) * product.quantity;
-      })
+      const verifiedProducts = await Promise.all(dto.products.map(async (product) => {
+        const foundProduct = await this.productRepository.findOne({ where: { id: product.id } });
+        if (!foundProduct) {
+          throw new HttpException(`El producto con id ${product.id} no existe.`, HttpStatus.BAD_REQUEST);
+        }
+        return foundProduct;
+      }));
 
+      verifiedProducts.forEach(product => {
+        const originalProduct = dto.products.find(p => p.id === product.id);
+        console.log('original product', originalProduct)
+        product.quantity =originalProduct.quantity;
+        product.platform = originalProduct.platform;
+        console.log( 'plataforma es ',product.platform)
+
+        const priceTemp = this.calcDiscountPrice(product.price, product.discount);
+        tempPayment += Number(priceTemp) * originalProduct.quantity;
+      });
+      
       const user = await this.userRepository.findOne({where: { id:  dto.user} });
         if (!user) {
           throw new HttpException("El usuario no existe.", HttpStatus.BAD_REQUEST);
         }
+
+
+
       
       const totalPayment = Math.round(tempPayment * 100);
       
@@ -92,6 +115,8 @@ export class OrderService {
 
       const Order  = plainToClass(OrderEntity, dto);
       Order.user = user;
+      Order.totalPayment = totalPayment/100;
+      Order.products = verifiedProducts;
 
       const creation = await this.repository.save(Order);
       const responseDto = plainToClass(OrderResponseDto,instanceToPlain(creation));

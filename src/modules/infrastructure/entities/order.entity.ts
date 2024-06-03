@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany, CreateDateColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { IOrderProduct } from 'src/interface/Iorder_product.interface';
+import { ProductEntity } from './Product.entity';
 
 
 @Entity('order')
@@ -24,15 +25,22 @@ export class OrderEntity {
   @Column({
     type: 'numeric',
     name: 'total-pagado',
-    precision: 100
+    precision: 10,  
+    scale: 2,
 })
   totalPayment: number;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    name: 'fecha-creado',
+  })
+  createdAt: Date;
 
   @Column('simple-json', {
     name: 'productos',
     nullable: false,
   })
-  products: IOrderProduct[];
+  products: ProductEntity[];
 
   @ManyToOne(() => UserEntity, user => user.order)
   user: UserEntity;

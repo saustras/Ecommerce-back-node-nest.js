@@ -70,8 +70,6 @@ export class OrderController {
         type: OrderResponseDto,
     })
 
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles(Role.USER)
     @Post()
     async createNewRegister(@Body() dto: OrderCreateDto) {
         return await this.service.createNewRegister(dto);
