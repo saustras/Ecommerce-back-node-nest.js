@@ -27,7 +27,7 @@ export class ProductEntity {
   discount: number;
 
   @Column({
-    name: 'descuento',
+    name: 'cantidad',
     nullable: true,
   })
   quantity: number;

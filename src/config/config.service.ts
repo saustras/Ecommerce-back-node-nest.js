@@ -27,14 +27,14 @@ class ConfigService {
       password: this.getValue('DB_PASS'),
       database: this.getValue('POSTGRES_DB'),
       entities: ['dist/**/*.entity.js'], 
-      synchronize: true,
+      synchronize: false,
       autoLoadEntities: true,
       ssl: false,
       logging: true,
     };
   }
 }
-
+  
 const configService = new ConfigService(process.env).ensureValues([
   'DB_HOST',
   'POSTGRES_PORT',
