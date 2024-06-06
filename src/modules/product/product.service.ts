@@ -68,7 +68,7 @@ export class ProductService {
                           wallpaperFile: Express.Multer.File, 
                           screenshotFiles: Express.Multer.File[]) {
     try {
-      let platform;
+      let platform: PlatformEntity;
 
       if (coverFile && wallpaperFile && screenshotFiles) {
         dto.cover = await cloudinary.uploader.upload(coverFile.path);
