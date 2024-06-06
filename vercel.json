@@ -1,0 +1,10 @@
+{
+    "version": 2,
+    "builds": [
+      { "src": "main.ts", "use": "@vercel/node" }
+    ],
+    "routes": [
+        { "src": "/api/v1/product", "dest": "/src/modules/product/product.controller.ts" },
+        { "src": "/api/v1/product/:id", "dest": "/src/modules/product/product.controller.ts" }
+    ]
+  }

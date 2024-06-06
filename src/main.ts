@@ -47,7 +47,7 @@ async function bootstrap() {
   );
 
   await app.startAllMicroservices();
-  await app.listen(`${process.env.PORT}`);
+  await app.listen(`${process.env.PORT || 4000}`);
   logger.log(
     `🚀 Procedure commerletter service running on port ${process.env.PORT}}`,
   );
