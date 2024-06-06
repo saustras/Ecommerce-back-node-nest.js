@@ -13,7 +13,7 @@ import { OrderResponseDto } from './dto/order_response.dto';
 import { OrderCreateDto } from './dto/order_create.dto';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import { StripeService } from 'src/config/stripe.service';
-import { ProductEntity } from '../infrastructure/entities/Product.entity';
+import { ProductEntity } from '../infrastructure/entities/product.entity';
 
 
 

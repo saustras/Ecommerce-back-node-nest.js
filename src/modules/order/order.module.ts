@@ -6,7 +6,7 @@ import { OrderController } from './order.controller';
 import { UserEntity } from '../infrastructure/entities/user.entity';
 import { StripeService } from 'src/config/stripe.service';
 import { OrderEntity } from '../infrastructure/entities/order.entity';
-import { ProductEntity } from '../infrastructure/entities/Product.entity';
+import { ProductEntity } from '../infrastructure/entities/product.entity';
 
 
 

@@ -5,7 +5,7 @@ import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
 import { PlatformEntity } from '../infrastructure/entities/platform.entity';
 import { CloudinaryProvider } from 'src/config/cloudinari.service';
-import { ProductEntity } from '../infrastructure/entities/Product.entity';
+import { ProductEntity } from '../infrastructure/entities/product.entity';
 
 
 

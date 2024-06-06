@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { ResponseDataDTO } from 'src/core/interfaces/response.data.dto';
 import { CRUDMessages } from 'src/core/interfaces/messages.enum';
 import { instanceToPlain, plainToClass } from 'class-transformer';
-import { ProductEntity } from '../infrastructure/entities/Product.entity';
+import { ProductEntity } from '../infrastructure/entities/product.entity';
 import { v2 as cloudinary } from 'cloudinary';
 import { ProductResponseDto } from './dto/product_response.dto';
 import { ProductCreateDto } from './dto/product_create.dto';

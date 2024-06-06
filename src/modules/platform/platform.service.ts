@@ -13,7 +13,7 @@ import { PlatformCreateDto } from './dto/platform_create.dto';
 import { PlatformResponseDto } from './dto/platform_response.dto';
 import { PlatformEntity } from '../infrastructure/entities/platform.entity';
 import { v2 as cloudinary } from 'cloudinary';
-import { ProductEntity } from '../infrastructure/entities/Product.entity';
+import { ProductEntity } from '../infrastructure/entities/product.entity';
 
 
 

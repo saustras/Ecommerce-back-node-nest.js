@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ProductEntity } from 'src/modules/infrastructure/entities/Product.entity';
+import { ProductEntity } from 'src/modules/infrastructure/entities/product.entity';
 
 export class PlatformResponseDto {
   @ApiProperty({ title: 'id', example: 1 })

@@ -18,8 +18,8 @@ import { PlatformModule } from './modules/platform/platform.module';
 import { CloudinaryProvider } from './config/cloudinari.service';
 import { ProductModule } from './modules/product/product.module';
 import { PlatformEntity } from './modules/infrastructure/entities/platform.entity';
-import { ProductEntity } from './modules/infrastructure/entities/Product.entity';
 import { OrderModule } from './modules/order/order.module';
+import { ProductEntity } from './modules/infrastructure/entities/product.entity';
 
 @Module({
   imports: [

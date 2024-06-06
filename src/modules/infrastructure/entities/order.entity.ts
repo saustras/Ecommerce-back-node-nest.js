@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index, OneToMany, CreateDateColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { IOrderProduct } from 'src/interface/Iorder_product.interface';
-import { ProductEntity } from './Product.entity';
+import { ProductEntity } from './product.entity';
 
 
 @Entity('order')
