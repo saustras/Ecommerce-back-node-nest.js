@@ -2,18 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginateQuery } from 'nestjs-paginate';
 import { CommonFilterService } from 'src/shared/service/common-filter.service';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ResponseDataDTO } from 'src/core/interfaces/response.data.dto';
 import { CRUDMessages } from 'src/core/interfaces/messages.enum';
 import { instanceToPlain, plainToClass } from 'class-transformer';
-import { AddressResponseDto } from '../address/dto/address_response.dto';
 import { ProductEntity } from '../infrastructure/entities/Product.entity';
 import { v2 as cloudinary } from 'cloudinary';
 import { ProductResponseDto } from './dto/product_response.dto';
 import { ProductCreateDto } from './dto/product_create.dto';
 import { PlatformEntity } from '../infrastructure/entities/platform.entity';
-
-
 
 @Injectable()
 export class ProductService {
@@ -35,17 +32,15 @@ export class ProductService {
       queryBuilder.where('platform.slug = :platformSlug', { platformSlug: query.filter['platform.slug'] });
     }
 
-
     return await this.commonFilterService.paginateFilter<ProductEntity>(query, this.repository, queryBuilder, 'id');
-
   }
 
   async findOne(id: number) {
     const product = await this.repository
-          .createQueryBuilder('product')
-          .leftJoinAndSelect('product.platform', 'platform') 
-          .where('product.id = :id', { id })
-          .getOne();
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.platform', 'platform')
+      .where('product.id = :id', { id })
+      .getOne();
 
     const responseDto = plainToClass(ProductResponseDto, instanceToPlain(product));
     return responseDto
@@ -63,70 +58,75 @@ export class ProductService {
         };
   }
 
-  async createNewRegister(dto: ProductCreateDto, 
-                          coverFile: Express.Multer.File, 
-                          wallpaperFile: Express.Multer.File, 
-                          screenshotFiles: Express.Multer.File[]) {
+  async createNewRegister(
+    dto: ProductCreateDto,
+    coverFile: Express.Multer.File,
+    wallpaperFile: Express.Multer.File,
+    screenshotFiles: Express.Multer.File[],
+  ) {
     try {
       let platform: PlatformEntity;
 
       if (coverFile && wallpaperFile && screenshotFiles) {
         dto.cover = await cloudinary.uploader.upload(coverFile.path);
         dto.wallpaper = await cloudinary.uploader.upload(wallpaperFile.path);
-        dto.screenshots = await Promise.all(screenshotFiles.map(file => cloudinary.uploader.upload(file.path)));;
-      }
-      
-      if (!dto.platform) {
-        throw new HttpException("Ingrese la plataforma", HttpStatus.BAD_REQUEST);
+        dto.screenshots = await Promise.all(screenshotFiles.map((file) => cloudinary.uploader.upload(file.path)));
       }
 
-      platform = await this.platformRepository.findOne({where: { id:  dto.platform} });
+      if (!dto.platform) {
+        throw new HttpException('Ingrese la plataforma', HttpStatus.BAD_REQUEST);
+      }
+
+      platform = await this.platformRepository.findOne({ where: { id: dto.platform } });
 
       if (!platform) {
-        throw new HttpException("La plataforma no existe.", HttpStatus.BAD_REQUEST);
+        throw new HttpException('La plataforma no existe.', HttpStatus.BAD_REQUEST);
       }
 
-      const product  = plainToClass(ProductEntity, dto);
+      const product = plainToClass(ProductEntity, dto);
       product.platform = platform;
 
       const creation = await this.repository.save(product);
-      const responseDto = plainToClass(ProductResponseDto,instanceToPlain(creation));
+      const responseDto = plainToClass(ProductResponseDto, instanceToPlain(creation));
 
       return {
         statusCode: HttpStatus.OK,
         message: [CRUDMessages.CreateSuccess],
         data: responseDto,
-      }; 
+      };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async updateRegister(dto: ProductCreateDto, 
-                      id: number, 
-                      coverFile: Express.Multer.File,
-                      wallpaperFile: Express.Multer.File, 
-                      screenshotFiles: Express.Multer.File[] ) {
+  async updateRegister(
+    dto: ProductCreateDto,
+    id: number,
+    coverFile: Express.Multer.File,
+    wallpaperFile: Express.Multer.File,
+    screenshotFiles: Express.Multer.File[],
+  ) {
     try {
-      let platform;
+      let platform: PlatformEntity;
 
       if (coverFile && wallpaperFile && screenshotFiles) {
         dto.cover = await cloudinary.uploader.upload(coverFile.path);
         dto.wallpaper = await cloudinary.uploader.upload(wallpaperFile.path);
-        dto.screenshots = await Promise.all(screenshotFiles.map(file => cloudinary.uploader.upload(file.path)));
+        dto.screenshots = await Promise.all(screenshotFiles.map((file) => cloudinary.uploader.upload(file.path)));
       }
       if (!dto.platform) {
-        throw new HttpException("Ingrese la plataforma", HttpStatus.BAD_REQUEST);
+        throw new HttpException('Ingrese la plataforma', HttpStatus.BAD_REQUEST);
       }
 
-      platform = await this.platformRepository.findOne({where: { id:  dto.platform} });
+      platform = await this.platformRepository.findOne({ where: { id: dto.platform } });
 
       if (!platform) {
-        throw new HttpException("La plataforma no existe.", HttpStatus.BAD_REQUEST);
+        throw new HttpException('La plataforma no existe.', HttpStatus.BAD_REQUEST);
       }
 
-      const product  = plainToClass(ProductEntity, dto);
+      const product = plainToClass(ProductEntity, dto);
       product.platform = platform;
+
       const { affected } = await this.repository.update({ id: id }, product);
       if (affected == 1) {
         return {
