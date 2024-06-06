@@ -2,8 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsOptional, ValidateNested, IsArray, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Message } from 'src/shared/utils/message.decorator';
-import { PlatformResponseDto } from 'src/modules/platform/dto/platform_response.dto';
-import { ProductEntity } from 'src/modules/infrastructure/entities/Product.entity';
 import { IOrderProduct } from 'src/interface/Iorder_product.interface';
 
 export class OrderCreateDto {

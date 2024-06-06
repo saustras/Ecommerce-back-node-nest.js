@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNumber, IsObject, IsOptional, IsString, Length, Max } from 'class-validator';
-import { ProductEntity } from 'src/modules/infrastructure/entities/Product.entity';
-import { UserDto } from 'src/modules/user/dto/user.dto';
 import { Message } from 'src/shared/utils/message.decorator';
 
 export class PlatformCreateDto {
