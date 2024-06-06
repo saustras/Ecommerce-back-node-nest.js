@@ -7,7 +7,7 @@ import { ResponseDataDTO } from 'src/core/interfaces/response.data.dto';
 import { CRUDMessages } from 'src/core/interfaces/messages.enum';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { AddressResponseDto } from '../address/dto/address_response.dto';
-import { OrderEntity } from '../infrastructure/entities/Order.entity';
+import { OrderEntity } from '../infrastructure/entities/order.entity';
 import { v2 as cloudinary } from 'cloudinary';
 import { OrderResponseDto } from './dto/order_response.dto';
 import { OrderCreateDto } from './dto/order_create.dto';
@@ -73,7 +73,7 @@ export class OrderService {
   async createNewRegister(dto: OrderCreateDto) {
     try {
       const currency = "usd";
-      let tempPayment = 0;
+      let tempPayment:number = 0;
 
       const verifiedProducts = await Promise.all(dto.products.map(async (product) => {
         const foundProduct = await this.productRepository.findOne({ where: { id: product.id } });
@@ -94,7 +94,7 @@ export class OrderService {
         tempPayment += Number(priceTemp) * originalProduct.quantity;
       });
       
-      const user = await this.userRepository.findOne({where: { id:  dto.user} });
+      const user: UserEntity = await this.userRepository.findOne({where: { id:  dto.user} });
         if (!user) {
           throw new HttpException("El usuario no existe.", HttpStatus.BAD_REQUEST);
         }
