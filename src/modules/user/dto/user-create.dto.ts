@@ -15,7 +15,7 @@ export class UserCreateDto {
     name: string;
 
     @IsString({ message: Message.STRING('$property') })
-    @Length(1, 500, { message: Message.LENGTH('$property', '$constraint1 $constraint2') })
+    @Length(0, 500, { message: Message.LENGTH('$property', '$constraint1 $constraint2') })
     @ApiProperty({ title: 'apellido', example: 'rendon', required: false })
     @IsOptional()
     lastname: string;

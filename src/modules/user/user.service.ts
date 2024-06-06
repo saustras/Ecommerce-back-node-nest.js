@@ -102,7 +102,7 @@ export class UserService {
           throw new HttpException('El nombre de usuario ya existe.', HttpStatus.BAD_REQUEST);
         }
         if (error.message.includes('unique_Email')) {
-          throw new HttpException('Ya correo ya existe.', HttpStatus.BAD_REQUEST);
+          throw new HttpException('El correo ya existe.', HttpStatus.BAD_REQUEST);
         }
       }
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
