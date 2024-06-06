@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Length, IsEmail, IsNumber, Max } from 'class-validator';
+import { IsString, Length, IsEmail, IsNumber, Max, IsOptional } from 'class-validator';
 import { RoleEntity } from 'src/modules/infrastructure/entities/role.entity';
 import { Message } from 'src/shared/utils/message.decorator';
 
@@ -17,6 +17,7 @@ export class UserCreateDto {
     @IsString({ message: Message.STRING('$property') })
     @Length(1, 500, { message: Message.LENGTH('$property', '$constraint1 $constraint2') })
     @ApiProperty({ title: 'apellido', example: 'rendon', required: false })
+    @IsOptional()
     lastname: string;
   
     @IsEmail({}, { message: 'El correo debe ser válido' })
